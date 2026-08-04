@@ -18,16 +18,24 @@ import adminRoutes from './routes/adminRoutes.js';
 
 dotenv.config();
 
-connectDB();
-
 const app = express();
+
+// Ensure MongoDB is connected for incoming requests
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// CORS setup
-app.use(cors());
+// CORS setup - Allow requests from frontend & Vercel
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // Body parser
 app.use(express.json());
@@ -35,12 +43,16 @@ app.use(express.json());
 // Rate Limiter
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 300,
+  max: 500,
   message: 'Too many requests from this IP, please try again after 15 minutes'
 });
 app.use('/api', limiter);
 
-// Root route
+// Root & Health check routes
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'SajjadCenter Serverless API is running cleanly on Vercel' });
+});
+
 app.get('/', (req, res) => {
   res.send('SajjadCenter REST API is running cleanly...');
 });
@@ -59,8 +71,12 @@ app.use('/api/admin', adminRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
+// Standalone local server mode (only when not running on Vercel serverless)
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running in local mode on port ${PORT}`);
+  });
+}
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT} bound to 0.0.0.0 (All Network Interfaces)`);
-});
+export default app;
