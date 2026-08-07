@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '../../context/CartContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { usePaymentSettings } from '../../context/PaymentSettingsContext';
+import { useAuth } from '../../context/AuthContext';
 import { ShieldCheck, CreditCard, Banknote, CheckCircle, ArrowRight, Truck, Copy, Settings, X, Lock, KeyRound } from 'lucide-react';
 
 export default function CheckoutPage() {
@@ -13,6 +14,7 @@ export default function CheckoutPage() {
   const { cartItems, itemsPrice, shippingPrice, discountAmount, totalPrice, clearCart } = useCart();
   const { format } = useCurrency();
   const { settings, updateSettings } = usePaymentSettings();
+  const { user } = useAuth();
 
   const [paymentMethod, setPaymentMethod] = useState('COD');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,6 +28,26 @@ export default function CheckoutPage() {
   const [pinError, setPinError] = useState('');
   const [editForm, setEditForm] = useState({ ...settings });
   const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
+
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    postalCode: ''
+  });
+
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        fullName: user.name || prev.fullName,
+        email: user.email || prev.email,
+        phone: user.phone || prev.phone
+      }));
+    }
+  }, [user]);
 
   const handleVerifyPin = (e) => {
     e.preventDefault();
@@ -48,17 +70,6 @@ export default function CheckoutPage() {
     }, 1500);
   };
 
-
-  const [formData, setFormData] = useState({
-    fullName: 'Fakhir Chaudhry',
-    email: 'customer@sajjadcenter.com',
-    phone: '+92 300 1234567',
-    address: 'House #45, Commercial Plaza, Garh More',
-    city: 'Garh More',
-    postalCode: '35000'
-  });
-
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -79,7 +90,6 @@ export default function CheckoutPage() {
         paymentMethod,
         transactionRef,
         orderItems: cartItems,
-
         shippingAddress: formData,
         orderStatus: 'Pending',
         createdAt: new Date().toISOString()
@@ -106,7 +116,6 @@ export default function CheckoutPage() {
           Thank you for shopping with <strong>SajjadCenter</strong>. Your order is now being processed by our boutique team.
         </p>
 
-
         <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 text-left space-y-3 max-w-md mx-auto shadow-md">
           <div className="flex justify-between text-xs border-b pb-2">
             <span className="text-gray-500">Order Tracking ID:</span>
@@ -123,7 +132,6 @@ export default function CheckoutPage() {
             </div>
           )}
           <div className="flex justify-between text-xs font-bold text-emerald-950 dark:text-gold-400">
-
             <span>Total Paid Amount:</span>
             <span>{format(orderComplete.totalPrice)}</span>
           </div>
@@ -153,8 +161,7 @@ export default function CheckoutPage() {
         Checkout & Shipping
       </h1>
 
-
-      {/* Admin Quick Settings Modal Overlay (Right inside Checkout Page) */}
+      {/* Admin Quick Settings Modal Overlay */}
       {isAdminModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl p-6 sm:p-8 border-2 border-gold-500/40 space-y-6 max-h-[90vh] overflow-y-auto">
@@ -172,7 +179,6 @@ export default function CheckoutPage() {
             </div>
 
             {!isPinVerified ? (
-              /* PIN Verification Step */
               <form onSubmit={handleVerifyPin} className="space-y-4 text-xs">
                 <div className="text-center space-y-2 py-2">
                   <div className="w-12 h-12 bg-emerald-900 text-gold-400 rounded-full flex items-center justify-center mx-auto border-2 border-gold-500">
@@ -217,7 +223,6 @@ export default function CheckoutPage() {
                 </button>
               </form>
             ) : (
-              /* Settings Edit Form */
               <form onSubmit={handleSaveSettings} className="space-y-4 text-xs">
                 {saveSuccessMsg && (
                   <div className="p-3 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-900 font-bold text-center">
@@ -341,7 +346,6 @@ export default function CheckoutPage() {
         </div>
       )}
 
-
       <form onSubmit={handlePlaceOrder} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left 2 Cols: Shipping Details & Payment Selection */}
         <div className="lg:col-span-2 space-y-8">
@@ -359,9 +363,10 @@ export default function CheckoutPage() {
                   type="text"
                   name="fullName"
                   required
+                  placeholder="Enter Full Name"
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none"
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
               </div>
 
@@ -371,9 +376,10 @@ export default function CheckoutPage() {
                   type="text"
                   name="phone"
                   required
+                  placeholder="Enter Phone Number (WhatsApp)"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none"
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
               </div>
 
@@ -383,9 +389,10 @@ export default function CheckoutPage() {
                   type="email"
                   name="email"
                   required
+                  placeholder="Enter Email Address"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none"
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
               </div>
 
@@ -395,9 +402,10 @@ export default function CheckoutPage() {
                   type="text"
                   name="address"
                   required
+                  placeholder="Enter Street Address / House #"
                   value={formData.address}
                   onChange={handleChange}
-                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none"
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
               </div>
 
@@ -407,9 +415,10 @@ export default function CheckoutPage() {
                   type="text"
                   name="city"
                   required
+                  placeholder="Enter City (e.g. Garh More, Lahore)"
                   value={formData.city}
                   onChange={handleChange}
-                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none"
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
               </div>
 
@@ -418,9 +427,10 @@ export default function CheckoutPage() {
                 <input
                   type="text"
                   name="postalCode"
+                  placeholder="Enter Postal Code"
                   value={formData.postalCode}
                   onChange={handleChange}
-                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none"
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500"
                 />
               </div>
             </div>
@@ -464,7 +474,7 @@ export default function CheckoutPage() {
                 </span>
                 <div>
                   <p className="font-bold text-xs text-gray-900 dark:text-white">JazzCash Mobile Wallet</p>
-                  <p className="text-[10px] text-gray-500">Send to 0300-1234567 (SajjadCenter)</p>
+                  <p className="text-[10px] text-gray-500">Send to JazzCash (SajjadCenter)</p>
                 </div>
               </label>
 
@@ -482,7 +492,7 @@ export default function CheckoutPage() {
                 </span>
                 <div>
                   <p className="font-bold text-xs text-gray-900 dark:text-white">Easypaisa Wallet</p>
-                  <p className="text-[10px] text-gray-500">Send to 0312-9876543 (SajjadCenter)</p>
+                  <p className="text-[10px] text-gray-500">Send to Easypaisa (SajjadCenter)</p>
                 </div>
               </label>
 
@@ -546,7 +556,6 @@ export default function CheckoutPage() {
                       <p><strong>IBAN:</strong> <span className="font-mono font-bold">{settings.bankIban}</span></p>
                     </div>
                   )}
-
                 </div>
 
                 <div>
@@ -556,19 +565,18 @@ export default function CheckoutPage() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. 981240182741"
+                    placeholder="Enter TRX ID (e.g. 981240182741)"
                     value={transactionRef}
                     onChange={(e) => setTransactionRef(e.target.value)}
                     className="w-full bg-white dark:bg-slate-900 border border-gray-300 dark:border-slate-700 p-2.5 rounded-lg focus:outline-none font-mono font-bold"
                   />
                   <p className="text-[10px] text-gray-500 mt-1">
-                    Enter the 12-digit transaction ID received in SMS after payment transfer.
+                    Enter the transaction ID received in SMS after payment transfer.
                   </p>
                 </div>
               </div>
             )}
           </div>
-
         </div>
 
         {/* Right Col: Summary & Submit Action */}

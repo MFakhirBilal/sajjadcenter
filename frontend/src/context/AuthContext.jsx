@@ -16,18 +16,6 @@ export const AuthProvider = ({ children }) => {
       } catch (e) {
         console.error(e);
       }
-    } else {
-      // Default demo user if none exists
-      const demoUser = {
-        _id: 'usr-demo-1',
-        name: 'Fakhir Chaudhry',
-        email: 'customer@sajjadcenter.com',
-        role: 'customer',
-        phone: '+923001234567',
-        token: 'demo-jwt-token'
-      };
-      setUser(demoUser);
-      localStorage.setItem('sajjad_user', JSON.stringify(demoUser));
     }
     setLoading(false);
   }, []);
