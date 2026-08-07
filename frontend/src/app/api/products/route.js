@@ -1,5 +1,5 @@
-import { connectDB } from '../../../../../backend/config/db.js';
-import Product from '../../../../../backend/models/Product.js';
+import { connectDB } from '@/lib/db';
+import Product from '@/lib/models/Product';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,7 +15,7 @@ const maleImages = [
   'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800'
 ];
 
-function generate100Products() {
+function generate30Products() {
   const products = [];
   const categories = ['Women', 'Men', 'Kids', 'Accessories', 'Unstitched', 'Ready to Wear'];
   const fabrics = ['Luxury Lawn', 'Egyptian Cotton', 'Chiffon Silk', 'Wash & Wear', 'Pure Velvet'];
@@ -51,7 +51,7 @@ export async function GET(request) {
     await connectDB();
     let count = await Product.countDocuments();
     if (count === 0) {
-      const sample = generate100Products();
+      const sample = generate30Products();
       await Product.insertMany(sample);
       count = sample.length;
     }
@@ -65,8 +65,7 @@ export async function GET(request) {
     });
   } catch (error) {
     console.error('Products API Error:', error);
-    // Fallback response with sample products if DB fails
-    const sample = generate100Products();
+    const sample = generate30Products();
     return Response.json({
       products: sample,
       totalProducts: sample.length,

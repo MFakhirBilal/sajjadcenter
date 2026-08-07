@@ -1,5 +1,5 @@
-import { connectDB } from '../../../../../backend/config/db.js';
-import Category from '../../../../../backend/models/Category.js';
+import { connectDB } from '@/lib/db';
+import Category from '@/lib/models/Category';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
