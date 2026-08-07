@@ -1,5 +1,5 @@
-import { connectDB } from '@/lib/db';
-import Product from '@/lib/models/Product';
+import { connectDB } from '../../../lib/db.js';
+import Product from '../../../lib/models/Product.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

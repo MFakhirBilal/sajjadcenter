@@ -1,5 +1,5 @@
-import { connectDB } from '@/lib/db';
-import Coupon from '@/lib/models/Coupon';
+import { connectDB } from '../../../lib/db.js';
+import Coupon from '../../../lib/models/Coupon.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

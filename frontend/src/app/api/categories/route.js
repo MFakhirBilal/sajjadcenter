@@ -1,5 +1,5 @@
-import { connectDB } from '@/lib/db';
-import Category from '@/lib/models/Category';
+import { connectDB } from '../../../lib/db.js';
+import Category from '../../../lib/models/Category.js';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

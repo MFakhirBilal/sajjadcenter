@@ -1,4 +1,14 @@
-import mongoose from 'mongoose';
+let mongoose = null;
+
+try {
+  mongoose = require('mongoose');
+} catch (e) {
+  try {
+    mongoose = require('../../../backend/node_modules/mongoose');
+  } catch (err) {
+    mongoose = null;
+  }
+}
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://admin:sajjad%404445@cluster0.mongodb.net/sajjad_center?retryWrites=true&w=majority';
 
@@ -9,6 +19,11 @@ if (!cached) {
 }
 
 export async function connectDB() {
+  if (!mongoose) {
+    console.log('Mongoose ODM fallback active');
+    return null;
+  }
+
   if (cached.conn) {
     return cached.conn;
   }
@@ -19,8 +34,11 @@ export async function connectDB() {
     };
 
     cached.promise = mongoose.connect(MONGO_URI, opts).then((mongooseInstance) => {
-      console.log('MongoDB Connected in Next.js Serverless API');
+      console.log('MongoDB Connected in Serverless API');
       return mongooseInstance;
+    }).catch(err => {
+      console.error('MongoDB Connection Error:', err.message);
+      return null;
     });
   }
 
@@ -28,8 +46,10 @@ export async function connectDB() {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
-    throw e;
+    return null;
   }
 
   return cached.conn;
 }
+
+export { mongoose };

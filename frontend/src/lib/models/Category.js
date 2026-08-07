@@ -1,13 +1,19 @@
-import mongoose from 'mongoose';
+import { mongoose } from '../db.js';
 
-const categorySchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true },
-    slug: { type: String, required: true, unique: true },
-    parentCategory: { type: String },
-    image: { type: String }
-  },
-  { timestamps: true }
-);
+let CategoryModel = null;
 
-export default mongoose.models.Category || mongoose.model('Category', categorySchema);
+if (mongoose && mongoose.Schema) {
+  const categorySchema = new mongoose.Schema(
+    {
+      name: { type: String, required: true },
+      slug: { type: String, required: true, unique: true },
+      parentCategory: { type: String },
+      image: { type: String }
+    },
+    { timestamps: true }
+  );
+
+  CategoryModel = mongoose.models.Category || mongoose.model('Category', categorySchema);
+}
+
+export default CategoryModel;
