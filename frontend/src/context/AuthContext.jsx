@@ -12,9 +12,21 @@ export const AuthProvider = ({ children }) => {
     const storedUser = localStorage.getItem('sajjad_user');
     if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        const parsedUser = JSON.parse(storedUser);
+        // Automatically purge old cached demo user 'Fakhir Chaudhry'
+        if (
+          parsedUser?._id === 'usr-demo-1' ||
+          parsedUser?.name === 'Fakhir Chaudhry' ||
+          parsedUser?.email === 'customer@sajjadcenter.com'
+        ) {
+          localStorage.removeItem('sajjad_user');
+          setUser(null);
+        } else {
+          setUser(parsedUser);
+        }
       } catch (e) {
         console.error(e);
+        localStorage.removeItem('sajjad_user');
       }
     }
     setLoading(false);

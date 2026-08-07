@@ -39,13 +39,29 @@ export default function CheckoutPage() {
   });
 
   useEffect(() => {
-    if (user) {
+    // Force clear old cached demo user in browser if present
+    if (typeof window !== 'undefined') {
+      const cached = localStorage.getItem('sajjad_user');
+      if (cached && (cached.includes('Fakhir') || cached.includes('customer@sajjadcenter.com'))) {
+        localStorage.removeItem('sajjad_user');
+      }
+    }
+    if (user && user.name !== 'Fakhir Chaudhry') {
       setFormData(prev => ({
         ...prev,
-        fullName: user.name || prev.fullName,
-        email: user.email || prev.email,
-        phone: user.phone || prev.phone
+        fullName: user.name || '',
+        email: user.email || '',
+        phone: user.phone || ''
       }));
+    } else {
+      setFormData({
+        fullName: '',
+        email: '',
+        phone: '',
+        address: '',
+        city: '',
+        postalCode: ''
+      });
     }
   }, [user]);
 
@@ -366,7 +382,7 @@ export default function CheckoutPage() {
                   placeholder="Enter Full Name"
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500"
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 font-medium text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -379,7 +395,7 @@ export default function CheckoutPage() {
                   placeholder="Enter Phone Number (WhatsApp)"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500"
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 font-medium text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -392,7 +408,7 @@ export default function CheckoutPage() {
                   placeholder="Enter Email Address"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500"
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 font-medium text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -405,7 +421,7 @@ export default function CheckoutPage() {
                   placeholder="Enter Street Address / House #"
                   value={formData.address}
                   onChange={handleChange}
-                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500"
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 font-medium text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -418,7 +434,7 @@ export default function CheckoutPage() {
                   placeholder="Enter City (e.g. Garh More, Lahore)"
                   value={formData.city}
                   onChange={handleChange}
-                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500"
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 font-medium text-gray-900 dark:text-white"
                 />
               </div>
 
@@ -430,7 +446,7 @@ export default function CheckoutPage() {
                   placeholder="Enter Postal Code"
                   value={formData.postalCode}
                   onChange={handleChange}
-                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500"
+                  className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 font-medium text-gray-900 dark:text-white"
                 />
               </div>
             </div>
