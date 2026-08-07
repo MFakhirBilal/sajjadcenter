@@ -90,12 +90,12 @@ export default function CheckoutPage() {
 
   const handleChange = (e) => {
     const fieldMap = {
-      user_shipping_fullname_custom: 'fullName',
-      user_shipping_phone_custom: 'phone',
-      user_shipping_email_custom: 'email',
-      user_shipping_address_custom: 'address',
-      user_shipping_city_custom: 'city',
-      user_shipping_postal_custom: 'postalCode'
+      sc_fname_field: 'fullName',
+      sc_phone_field: 'phone',
+      sc_email_field: 'email',
+      sc_address_field: 'address',
+      sc_city_field: 'city',
+      sc_postal_field: 'postalCode'
     };
     const nameKey = fieldMap[e.target.name] || e.target.name;
     setFormData({ ...formData, [nameKey]: e.target.value });
@@ -388,10 +388,10 @@ export default function CheckoutPage() {
                 <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
                 <input
                   type="text"
-                  name="user_shipping_fullname_custom"
-                  autoComplete="off"
+                  name="sc_fname_field"
+                  autoComplete="new-password"
                   required
-                  placeholder="Enter Full Name"
+                  placeholder="Enter your Name"
                   value={formData.fullName}
                   onChange={handleChange}
                   className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 font-medium text-gray-900 dark:text-white"
@@ -402,10 +402,10 @@ export default function CheckoutPage() {
                 <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">Phone Number (WhatsApp)</label>
                 <input
                   type="text"
-                  name="user_shipping_phone_custom"
-                  autoComplete="off"
+                  name="sc_phone_field"
+                  autoComplete="new-password"
                   required
-                  placeholder="Enter Phone Number (WhatsApp)"
+                  placeholder="Enter your PhoneNo"
                   value={formData.phone}
                   onChange={handleChange}
                   className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 font-medium text-gray-900 dark:text-white"
@@ -416,10 +416,10 @@ export default function CheckoutPage() {
                 <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
                 <input
                   type="email"
-                  name="user_shipping_email_custom"
-                  autoComplete="off"
+                  name="sc_email_field"
+                  autoComplete="new-password"
                   required
-                  placeholder="Enter Email Address"
+                  placeholder="enter your email"
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 font-medium text-gray-900 dark:text-white"
@@ -430,10 +430,10 @@ export default function CheckoutPage() {
                 <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">Street Address</label>
                 <input
                   type="text"
-                  name="user_shipping_address_custom"
-                  autoComplete="off"
+                  name="sc_address_field"
+                  autoComplete="new-password"
                   required
-                  placeholder="Enter Street Address / House #"
+                  placeholder="enter your address"
                   value={formData.address}
                   onChange={handleChange}
                   className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 font-medium text-gray-900 dark:text-white"
@@ -444,10 +444,10 @@ export default function CheckoutPage() {
                 <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">City</label>
                 <input
                   type="text"
-                  name="user_shipping_city_custom"
-                  autoComplete="off"
+                  name="sc_city_field"
+                  autoComplete="new-password"
                   required
-                  placeholder="Enter City (e.g. Garh More, Lahore)"
+                  placeholder="enter your city"
                   value={formData.city}
                   onChange={handleChange}
                   className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 font-medium text-gray-900 dark:text-white"
@@ -458,9 +458,9 @@ export default function CheckoutPage() {
                 <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">Postal Code</label>
                 <input
                   type="text"
-                  name="user_shipping_postal_custom"
-                  autoComplete="off"
-                  placeholder="Enter Postal Code"
+                  name="sc_postal_field"
+                  autoComplete="new-password"
+                  placeholder="enter your code"
                   value={formData.postalCode}
                   onChange={handleChange}
                   className="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 p-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-gold-500 font-medium text-gray-900 dark:text-white"
