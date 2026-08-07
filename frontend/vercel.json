@@ -1,7 +1,4 @@
 {
-  "name": "sajjadcenter",
-  "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "devCommand": "npm run dev",
-  "installCommand": "npm install"
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": ".next"
 }
