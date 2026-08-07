@@ -39,14 +39,16 @@ export default function CheckoutPage() {
   });
 
   useEffect(() => {
-    // Force clear old cached demo user in browser if present
+    // Force purge cached demo user from localStorage if present
     if (typeof window !== 'undefined') {
-      const cached = localStorage.getItem('sajjad_user');
-      if (cached && (cached.includes('Fakhir') || cached.includes('customer@sajjadcenter.com'))) {
-        localStorage.removeItem('sajjad_user');
-      }
+      try {
+        const cached = localStorage.getItem('sajjad_user');
+        if (cached && (cached.includes('Fakhir') || cached.includes('customer@sajjadcenter.com'))) {
+          localStorage.removeItem('sajjad_user');
+        }
+      } catch (e) {}
     }
-    if (user && user.name !== 'Fakhir Chaudhry') {
+    if (user && user.name && user.name !== 'Fakhir Chaudhry') {
       setFormData(prev => ({
         ...prev,
         fullName: user.name || '',
@@ -87,7 +89,16 @@ export default function CheckoutPage() {
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const fieldMap = {
+      user_shipping_fullname_custom: 'fullName',
+      user_shipping_phone_custom: 'phone',
+      user_shipping_email_custom: 'email',
+      user_shipping_address_custom: 'address',
+      user_shipping_city_custom: 'city',
+      user_shipping_postal_custom: 'postalCode'
+    };
+    const nameKey = fieldMap[e.target.name] || e.target.name;
+    setFormData({ ...formData, [nameKey]: e.target.value });
   };
 
   const handlePlaceOrder = (e) => {
@@ -362,7 +373,7 @@ export default function CheckoutPage() {
         </div>
       )}
 
-      <form onSubmit={handlePlaceOrder} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <form onSubmit={handlePlaceOrder} autoComplete="off" className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left 2 Cols: Shipping Details & Payment Selection */}
         <div className="lg:col-span-2 space-y-8">
           {/* Shipping Form */}
@@ -377,7 +388,8 @@ export default function CheckoutPage() {
                 <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">Full Name</label>
                 <input
                   type="text"
-                  name="fullName"
+                  name="user_shipping_fullname_custom"
+                  autoComplete="off"
                   required
                   placeholder="Enter Full Name"
                   value={formData.fullName}
@@ -390,7 +402,8 @@ export default function CheckoutPage() {
                 <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">Phone Number (WhatsApp)</label>
                 <input
                   type="text"
-                  name="phone"
+                  name="user_shipping_phone_custom"
+                  autoComplete="off"
                   required
                   placeholder="Enter Phone Number (WhatsApp)"
                   value={formData.phone}
@@ -403,7 +416,8 @@ export default function CheckoutPage() {
                 <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
                 <input
                   type="email"
-                  name="email"
+                  name="user_shipping_email_custom"
+                  autoComplete="off"
                   required
                   placeholder="Enter Email Address"
                   value={formData.email}
@@ -416,7 +430,8 @@ export default function CheckoutPage() {
                 <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">Street Address</label>
                 <input
                   type="text"
-                  name="address"
+                  name="user_shipping_address_custom"
+                  autoComplete="off"
                   required
                   placeholder="Enter Street Address / House #"
                   value={formData.address}
@@ -429,7 +444,8 @@ export default function CheckoutPage() {
                 <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">City</label>
                 <input
                   type="text"
-                  name="city"
+                  name="user_shipping_city_custom"
+                  autoComplete="off"
                   required
                   placeholder="Enter City (e.g. Garh More, Lahore)"
                   value={formData.city}
@@ -442,7 +458,8 @@ export default function CheckoutPage() {
                 <label className="block font-bold text-gray-700 dark:text-gray-300 mb-1">Postal Code</label>
                 <input
                   type="text"
-                  name="postalCode"
+                  name="user_shipping_postal_custom"
+                  autoComplete="off"
                   placeholder="Enter Postal Code"
                   value={formData.postalCode}
                   onChange={handleChange}
