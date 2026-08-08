@@ -21,7 +21,16 @@ export const metadata = {
     default: 'SajjadCenter | Luxury Fashion & Clothing Store',
     template: '%s | SajjadCenter'
   },
-  description: 'SajjadCenter - Premier fashion store for luxury unstitched lawn, ready-to-wear kurtas, men waistcoats, kids eastern wear, and festive clothing.',
+  description: 'SajjadCenter - Step Into Style. Premier fashion store for luxury unstitched lawn, ready-to-wear kurtas, men waistcoats, kids eastern wear, and festive clothing.',
+  icons: {
+    icon: [
+      { url: '/sajjad_logo.jpg' },
+      { url: '/favicon.ico' },
+      { url: '/icon.png', type: 'image/png' }
+    ],
+    shortcut: '/sajjad_logo.jpg',
+    apple: '/sajjad_logo.jpg',
+  },
   keywords: [
     'SajjadCenter',
     'SajjadCenter Garh More',
@@ -41,7 +50,7 @@ export const metadata = {
     canonical: 'https://sajjadcenter.com'
   },
   openGraph: {
-    title: 'SajjadCenter | Luxury Fashion & Clothing Store',
+    title: 'SajjadCenter | Step Into Style',
     description: 'Shop luxury unstitched lawn, designer kurtas, waistcoats, and festive wear at SajjadCenter.',
     url: 'https://sajjadcenter.com',
     siteName: 'SajjadCenter',
@@ -49,18 +58,18 @@ export const metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200',
-        width: 1200,
-        height: 630,
-        alt: 'SajjadCenter Luxury Fashion Collection'
+        url: '/sajjad_logo.jpg',
+        width: 800,
+        height: 800,
+        alt: 'SajjadCenter Luxury Logo'
       }
     ]
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SajjadCenter | Luxury Fashion Store',
+    title: 'SajjadCenter | Step Into Style',
     description: 'Shop luxury unstitched lawn, designer kurtas, and waistcoats at SajjadCenter.',
-    images: ['https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200']
+    images: ['/sajjad_logo.jpg']
   },
   robots: {
     index: true,
@@ -80,7 +89,7 @@ export default function RootLayout({ children }) {
     '@context': 'https://schema.org',
     '@type': 'ClothingStore',
     name: 'SajjadCenter',
-    image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1200',
+    image: 'https://sajjadcenter.vercel.app/sajjad_logo.jpg',
     '@id': 'https://sajjadcenter.com',
     url: 'https://sajjadcenter.com',
     telephone: '+923001234567',
@@ -108,6 +117,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className="scroll-smooth">
       <head>
+        <link rel="icon" href="/sajjad_logo.jpg" priority="true" />
+        <link rel="apple-touch-icon" href="/sajjad_logo.jpg" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
