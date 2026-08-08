@@ -20,8 +20,15 @@ export default function HomePage() {
     return () => clearInterval(timer);
   }, []);
 
-  const featured = products.filter((p) => p.isFeatured || p._id.startsWith('prod-')).slice(0, 8);
-  const newArrivals = products.filter((p) => p.isNewArrival || p._id.startsWith('prod-')).slice(0, 8);
+  const safeProducts = Array.isArray(products) ? products.filter((p) => p && typeof p === 'object') : [];
+
+  const featured = safeProducts
+    .filter((p) => p.isFeatured || String(p._id || '').startsWith('prod-'))
+    .slice(0, 8);
+
+  const newArrivals = safeProducts
+    .filter((p) => p.isNewArrival || String(p._id || '').startsWith('prod-'))
+    .slice(0, 8);
 
   const categories = [
     { title: 'Women Unstitched', img: 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=600', link: '/shop?category=Women' },
@@ -37,7 +44,7 @@ export default function HomePage() {
       <section className="relative w-full h-[280px] xs:h-[340px] sm:h-[400px] lg:h-[440px] max-h-[500px] overflow-hidden bg-slate-950">
         {sampleBanners.map((slide, idx) => (
           <div
-            key={slide.id}
+            key={slide.id || idx}
             className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
               idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
             }`}
@@ -64,10 +71,10 @@ export default function HomePage() {
                   </p>
                   <div className="pt-1">
                     <Link
-                      href={slide.linkUrl}
+                      href={slide.linkUrl || '/shop'}
                       className="inline-flex items-center justify-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-amber-400 font-bold text-xs px-5 py-2.5 sm:px-6 sm:py-3 rounded-full shadow-lg transition-all transform hover:scale-105 border border-amber-500/40"
                     >
-                      <span>{slide.buttonText}</span>
+                      <span>{slide.buttonText || 'Shop Now'}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
@@ -161,8 +168,8 @@ export default function HomePage() {
 
         {/* Universal Compact Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-2.5 sm:gap-4">
-          {featured.map((product) => (
-            <ProductCard key={product._id} product={product} />
+          {featured.map((product, idx) => (
+            <ProductCard key={product._id || product.slug || idx} product={product} />
           ))}
         </div>
       </section>
@@ -212,8 +219,8 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-2.5 sm:gap-4">
-          {newArrivals.map((product) => (
-            <ProductCard key={product._id} product={product} />
+          {newArrivals.map((product, idx) => (
+            <ProductCard key={product._id || product.slug || idx} product={product} />
           ))}
         </div>
       </section>
