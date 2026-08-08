@@ -117,8 +117,8 @@ export default function Footer() {
               <span className="font-serif text-lg sm:text-xl font-black text-white tracking-tight group-hover:text-amber-400 transition-colors">
                 SAJJAD<span className="text-amber-500 font-light">CENTER</span>
               </span>
-              <span className="text-[8.5px] tracking-[0.2em] text-amber-400 font-bold block uppercase mt-0.5">
-                GARH MORE PREMIUM BOUTIQUE
+              <span className="text-[8.5px] tracking-[0.28em] text-amber-400 font-black block uppercase mt-0.5">
+                STEP INTO STYLE
               </span>
             </Link>
             <p className="text-xs text-slate-300 leading-relaxed max-w-sm font-medium">
@@ -189,7 +189,7 @@ export default function Footer() {
 
         {/* Bottom Copyright */}
         <div className="pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-400 font-medium">
-          <p>© {new Date().getFullYear()} SajjadCenter Clothing Boutique. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SajjadCenter • Step Into Style. All rights reserved.</p>
           <div className="flex items-center space-x-2 text-slate-400 text-[10px]">
             <span className="font-bold text-white">COD Available</span>
             <span>•</span>

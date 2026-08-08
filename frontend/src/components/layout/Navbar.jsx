@@ -38,7 +38,7 @@ export default function Navbar() {
               </button>
             </div>
 
-            {/* Premium Brand Logo with Generated Emblem */}
+            {/* Premium Brand Logo with Tagline */}
             <div className="flex-1 sm:flex-none text-center sm:text-left">
               <Link href="/" className="inline-block group">
                 <div className="flex items-center gap-2.5">
@@ -51,8 +51,8 @@ export default function Navbar() {
                     <span className="font-serif text-lg sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white block group-hover:text-amber-600 transition-colors leading-none">
                       SAJJAD<span className="text-amber-600 font-light">CENTER</span>
                     </span>
-                    <span className="text-[7.5px] sm:text-[9.5px] tracking-[0.22em] text-slate-500 dark:text-amber-400 font-extrabold block uppercase mt-1">
-                      LUXURY CLOTHING BOUTIQUE
+                    <span className="text-[8px] sm:text-[9.5px] tracking-[0.28em] text-amber-600 dark:text-amber-400 font-black block uppercase mt-1">
+                      STEP INTO STYLE
                     </span>
                   </div>
                 </div>
