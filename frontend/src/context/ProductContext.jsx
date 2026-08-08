@@ -11,21 +11,53 @@ export function ProductProvider({ children }) {
   const [products, setProducts] = useState(sampleProducts);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load products from localStorage or API on initial mount
+  // Load products from localStorage AND fetch from live Backend API /api/products
   useEffect(() => {
-    try {
-      const savedProducts = localStorage.getItem(STORAGE_KEY);
-      if (savedProducts) {
-        const parsed = JSON.parse(savedProducts);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setProducts(parsed);
+    async function loadCatalog() {
+      let localProds = [];
+      try {
+        const savedProducts = localStorage.getItem(STORAGE_KEY);
+        if (savedProducts) {
+          const parsed = JSON.parse(savedProducts);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            localProds = parsed;
+          }
         }
+      } catch (err) {
+        console.error('Failed to load products from localStorage:', err);
       }
-    } catch (err) {
-      console.error('Failed to load products from localStorage:', err);
-    } finally {
+
+      try {
+        const res = await fetch('/api/products', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && Array.isArray(data.products) && data.products.length > 0) {
+            // Merge local custom added products (like 'king') with backend products
+            const backendMap = new Map(data.products.map((p) => [p.slug || p._id, p]));
+            
+            // Bring local products that might not be in backend yet
+            const customAdded = localProds.filter((lp) => !backendMap.has(lp.slug || lp._id));
+            const merged = [...customAdded, ...data.products];
+            
+            setProducts(merged);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+            setIsLoaded(true);
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn('Backend API fetch failed, falling back to local catalog:', err);
+      }
+
+      if (localProds.length > 0) {
+        setProducts(localProds);
+      } else {
+        setProducts(sampleProducts);
+      }
       setIsLoaded(true);
     }
+
+    loadCatalog();
   }, []);
 
   // Save to localStorage whenever products state changes
@@ -39,12 +71,12 @@ export function ProductProvider({ children }) {
   };
 
   // Add a new product created from Admin Panel
-  const addProduct = (newProductData) => {
+  const addProduct = async (newProductData) => {
     const slug = newProductData.slug || newProductData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     const createdProduct = {
       _id: `prod-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
       slug: slug,
-      brand: newProductData.brand || 'SajjadCenter',
+      brand: newProductData.brand || 'SajjadClothHouse',
       name: newProductData.name,
       category: newProductData.category || 'Women',
       price: Number(newProductData.price) || 0,
@@ -55,7 +87,7 @@ export function ProductProvider({ children }) {
         : ['https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800'],
       sku: newProductData.sku || `SCH-${Math.floor(1000 + Math.random() * 9000)}`,
       barcode: newProductData.barcode || `${Math.floor(100000000000 + Math.random() * 900000000000)}`,
-      fabric: newProductData.fabric || 'Luxury Unstitched',
+      fabric: newProductData.fabric || 'Luxury Lawn 3-Piece Unstitched',
       description: newProductData.description || 'Exclusive Collection from SajjadCenter.',
       rating: 5.0,
       numReviews: 1,
@@ -65,15 +97,34 @@ export function ProductProvider({ children }) {
       createdAt: new Date().toISOString()
     };
 
+    // 1. Immediately update local state & localStorage so UI reflects instantly
     const updatedList = [createdProduct, ...products];
     saveProducts(updatedList);
+
+    // 2. Also send POST request to live Backend API /api/products to save in MongoDB
+    try {
+      await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(createdProduct)
+      });
+    } catch (err) {
+      console.warn('Failed to sync new product to backend API:', err);
+    }
+
     return createdProduct;
   };
 
   // Delete product by ID
-  const deleteProduct = (id) => {
+  const deleteProduct = async (id) => {
     const updatedList = products.filter((p) => p._id !== id);
     saveProducts(updatedList);
+
+    try {
+      await fetch(`/api/products?id=${id}`, { method: 'DELETE' });
+    } catch (err) {
+      console.warn('Failed to delete product from backend API:', err);
+    }
   };
 
   // Reset to default sample products

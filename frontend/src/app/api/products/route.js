@@ -55,7 +55,7 @@ export async function GET(request) {
       await Product.insertMany(sample);
       count = sample.length;
     }
-    const products = await Product.find().limit(50).sort({ createdAt: -1 });
+    const products = await Product.find().limit(100).sort({ createdAt: -1 });
 
     return Response.json({
       products,
@@ -72,5 +72,52 @@ export async function GET(request) {
       page: 1,
       pages: Math.ceil(sample.length / 12)
     });
+  }
+}
+
+export async function POST(request) {
+  try {
+    await connectDB();
+    const data = await request.json();
+    
+    const slug = data.slug || data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const newProduct = new Product({
+      name: data.name,
+      slug: slug,
+      description: data.description || 'Exclusive Collection from SajjadCenter.',
+      brand: data.brand || 'Sajjad Cloth House',
+      category: data.category || 'Women',
+      price: Number(data.price) || 0,
+      salePrice: Number(data.salePrice) || 0,
+      sku: data.sku || `SCH-${Math.floor(1000 + Math.random() * 9000)}`,
+      stock: Number(data.stock) || 10,
+      sizes: data.sizes || ['S', 'M', 'L', 'XL'],
+      images: data.images || ['https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800'],
+      rating: 5.0,
+      numReviews: 1,
+      isNewArrival: true,
+      isFeatured: true
+    });
+
+    const saved = await newProduct.save();
+    return Response.json({ success: true, product: saved }, { status: 201 });
+  } catch (error) {
+    console.error('POST Product API Error:', error);
+    return Response.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    await connectDB();
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (id) {
+      await Product.findByIdAndDelete(id);
+    }
+    return Response.json({ success: true });
+  } catch (error) {
+    console.error('DELETE Product API Error:', error);
+    return Response.json({ success: false, error: error.message }, { status: 500 });
   }
 }
