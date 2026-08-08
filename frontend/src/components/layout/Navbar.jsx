@@ -38,15 +38,24 @@ export default function Navbar() {
               </button>
             </div>
 
-            {/* Compact Brand Logo */}
+            {/* Premium Brand Logo with Generated Emblem */}
             <div className="flex-1 sm:flex-none text-center sm:text-left">
               <Link href="/" className="inline-block group">
-                <span className="font-serif text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white block group-hover:text-amber-600 transition-colors leading-none">
-                  SAJJAD<span className="text-amber-600 font-light">CENTER</span>
-                </span>
-                <span className="text-[8px] sm:text-[9.5px] tracking-[0.22em] text-slate-500 dark:text-amber-400 font-extrabold block uppercase mt-1">
-                  LUXURY CLOTHING BOUTIQUE
-                </span>
+                <div className="flex items-center gap-2.5">
+                  <img
+                    src="/sajjad_logo.jpg"
+                    alt="Sajjad Center Luxury Logo"
+                    className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-amber-500 shadow-md group-hover:scale-105 transition-transform"
+                  />
+                  <div className="text-left">
+                    <span className="font-serif text-lg sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white block group-hover:text-amber-600 transition-colors leading-none">
+                      SAJJAD<span className="text-amber-600 font-light">CENTER</span>
+                    </span>
+                    <span className="text-[7.5px] sm:text-[9.5px] tracking-[0.22em] text-slate-500 dark:text-amber-400 font-extrabold block uppercase mt-1">
+                      LUXURY CLOTHING BOUTIQUE
+                    </span>
+                  </div>
+                </div>
               </Link>
             </div>
 
