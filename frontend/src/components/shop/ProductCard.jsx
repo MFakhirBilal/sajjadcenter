@@ -12,21 +12,27 @@ export default function ProductCard({ product }) {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { format } = useCurrency();
 
-  const isLiked = isInWishlist(product._id);
-  const primaryImage = product.images && product.images.length > 0 ? product.images[0] : 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800';
+  if (!product || typeof product !== 'object') return null;
 
-  const currentPrice = product.salePrice && product.salePrice > 0 ? product.salePrice : product.price;
-  const hasSale = product.salePrice && product.salePrice > 0 && product.salePrice < product.price;
-  const discountPercent = hasSale ? Math.round(((product.price - product.salePrice) / product.price) * 100) : 0;
+  const productId = product._id || product.slug || 'item';
+  const isLiked = isInWishlist(productId);
+  const primaryImage = product.images && Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : 'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800';
+
+  const price = Number(product.price) || 0;
+  const salePrice = Number(product.salePrice) || 0;
+  const currentPrice = salePrice > 0 ? salePrice : price;
+  const hasSale = salePrice > 0 && salePrice < price;
+  const discountPercent = hasSale && price > 0 ? Math.round(((price - salePrice) / price) * 100) : 0;
+  const slug = product.slug || 'product';
 
   return (
     <div className="group relative bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl overflow-hidden shadow-2xs hover:shadow-md transition-all duration-300 border border-slate-100 dark:border-slate-800 flex flex-col h-full cinematic-card">
       {/* Image Showcase Container */}
       <div className="relative aspect-[3/4] w-full overflow-hidden bg-slate-50 dark:bg-slate-800">
-        <Link href={`/product/${product.slug}`} className="block w-full h-full">
+        <Link href={`/product/${slug}`} className="block w-full h-full">
           <img
             src={primaryImage}
-            alt={product.name}
+            alt={product.name || 'Product'}
             className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
           />
         </Link>
@@ -77,7 +83,7 @@ export default function ProductCard({ product }) {
             <span>Add to Cart</span>
           </button>
           <Link
-            href={`/product/${product.slug}`}
+            href={`/product/${slug}`}
             className="bg-white/95 hover:bg-white text-slate-900 p-1.5 rounded-lg flex items-center justify-center shadow-xs"
             title="Quick View"
           >
@@ -91,7 +97,7 @@ export default function ProductCard({ product }) {
         <div>
           <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-gray-400 mb-0.5">
             <span className="font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider text-[8.5px] sm:text-[9.5px] truncate max-w-[90px] sm:max-w-none">
-              {product.category}
+              {product.category || 'Women'}
             </span>
             <div className="flex items-center gap-0.5 text-amber-500 shrink-0">
               <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-amber-400" />
@@ -99,9 +105,9 @@ export default function ProductCard({ product }) {
             </div>
           </div>
 
-          <Link href={`/product/${product.slug}`} className="block group-hover:text-amber-600 transition-colors">
+          <Link href={`/product/${slug}`} className="block group-hover:text-amber-600 transition-colors">
             <h3 className="font-serif font-bold text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-1 leading-snug">
-              {product.name}
+              {product.name || 'SajjadCenter Suit'}
             </h3>
           </Link>
         </div>
@@ -114,13 +120,13 @@ export default function ProductCard({ product }) {
             </span>
             {hasSale && (
               <span className="text-[9px] sm:text-[10px] text-slate-400 line-through">
-                {format(product.price)}
+                {format(price)}
               </span>
             )}
           </div>
 
           <div className="hidden sm:flex items-center gap-0.5">
-            {product.sizes && product.sizes.slice(0, 3).map((sz, idx) => (
+            {product.sizes && Array.isArray(product.sizes) && product.sizes.slice(0, 3).map((sz, idx) => (
               <span key={idx} className="text-[8px] font-bold text-slate-500 dark:text-gray-400 bg-slate-100 dark:bg-slate-800 px-1 py-0.2 rounded">
                 {sz}
               </span>

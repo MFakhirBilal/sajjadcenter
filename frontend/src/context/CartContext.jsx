@@ -10,19 +10,25 @@ export const CartProvider = ({ children }) => {
   const [toastMessage, setToastMessage] = useState(null);
 
   useEffect(() => {
-    const storedCart = localStorage.getItem('sajjad_cart');
-    if (storedCart) {
-      try {
-        setCartItems(JSON.parse(storedCart));
-      } catch (e) {
-        console.error(e);
+    try {
+      const storedCart = localStorage.getItem('sajjad_cart');
+      if (storedCart) {
+        const parsed = JSON.parse(storedCart);
+        if (Array.isArray(parsed)) {
+          setCartItems(parsed.filter((item) => item && typeof item === 'object' && item._id));
+        }
       }
+    } catch (e) {
+      console.error('Cart storage error:', e);
     }
   }, []);
 
   const saveCart = (items) => {
-    setCartItems(items);
-    localStorage.setItem('sajjad_cart', JSON.stringify(items));
+    const valid = Array.isArray(items) ? items.filter((i) => i && typeof i === 'object') : [];
+    setCartItems(valid);
+    try {
+      localStorage.setItem('sajjad_cart', JSON.stringify(valid));
+    } catch (e) {}
   };
 
   const showToast = (msg) => {
@@ -31,28 +37,28 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCart = (product, qty = 1, chosenSize, chosenColor) => {
-    if (!product) return;
+    if (!product || !product.name) return;
 
     const sizeToUse = chosenSize || (product.sizes && product.sizes.length > 0 ? product.sizes[0] : 'Standard');
     const colorToUse = chosenColor || (product.colors && product.colors.length > 0 ? product.colors[0].name : 'Standard');
-    const priceToUse = product.salePrice && product.salePrice > 0 ? product.salePrice : product.price;
+    const priceToUse = product.salePrice && product.salePrice > 0 ? product.salePrice : product.price || 0;
 
     const existingIndex = cartItems.findIndex(
-      (item) => item._id === product._id && item.size === sizeToUse && item.color === colorToUse
+      (item) => item && item._id === product._id && item.size === sizeToUse && item.color === colorToUse
     );
 
     let updated;
     if (existingIndex > -1) {
       updated = cartItems.map((item, idx) =>
-        idx === existingIndex ? { ...item, qty: item.qty + qty } : item
+        idx === existingIndex ? { ...item, qty: (item.qty || 1) + (qty || 1) } : item
       );
     } else {
       updated = [
         ...cartItems,
         {
-          _id: product._id,
+          _id: product._id || `item-${Date.now()}`,
           name: product.name,
-          slug: product.slug,
+          slug: product.slug || '',
           image: product.images && product.images.length > 0 ? product.images[0] : '',
           price: priceToUse,
           qty: qty || 1,
@@ -72,13 +78,13 @@ export const CartProvider = ({ children }) => {
       return;
     }
     const updated = cartItems.map((item) =>
-      item._id === id && item.size === size && item.color === color ? { ...item, qty } : item
+      item && item._id === id && item.size === size && item.color === color ? { ...item, qty } : item
     );
     saveCart(updated);
   };
 
   const removeFromCart = (id, size, color) => {
-    const updated = cartItems.filter((item) => !(item._id === id && item.size === size && item.color === color));
+    const updated = cartItems.filter((item) => !(item && item._id === id && item.size === size && item.color === color));
     saveCart(updated);
   };
 
@@ -87,9 +93,12 @@ export const CartProvider = ({ children }) => {
     setCoupon(null);
   };
 
-  const itemsPrice = cartItems.reduce((acc, item) => acc + item.price * item.qty, 0);
+  const itemsPrice = cartItems.reduce(
+    (acc, item) => acc + (Number(item?.price) || 0) * (Number(item?.qty) || 1),
+    0
+  );
   const shippingPrice = itemsPrice >= 4999 || itemsPrice === 0 ? 0 : 250;
-  const discountAmount = coupon ? Math.round((itemsPrice * coupon.discountPercent) / 100) : 0;
+  const discountAmount = coupon ? Math.round((itemsPrice * (coupon.discountPercent || 0)) / 100) : 0;
   const totalPrice = Math.max(0, itemsPrice + shippingPrice - discountAmount);
 
   return (
@@ -107,7 +116,7 @@ export const CartProvider = ({ children }) => {
         coupon,
         setCoupon,
         toastMessage,
-        totalItemsCount: cartItems.reduce((sum, item) => sum + item.qty, 0)
+        totalItemsCount: cartItems.reduce((sum, item) => sum + (Number(item?.qty) || 1), 0)
       }}
     >
       {children}
@@ -116,4 +125,3 @@ export const CartProvider = ({ children }) => {
 };
 
 export const useCart = () => useContext(CartContext);
-

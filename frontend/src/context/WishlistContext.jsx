@@ -8,29 +8,38 @@ export const WishlistProvider = ({ children }) => {
   const [wishlist, setWishlist] = useState([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem('sajjad_wishlist');
-    if (stored) {
-      try {
-        setWishlist(JSON.parse(stored));
-      } catch (e) {
-        console.error(e);
+    try {
+      const stored = localStorage.getItem('sajjad_wishlist');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          setWishlist(parsed.filter((item) => item && typeof item === 'object' && item._id));
+        }
       }
+    } catch (e) {
+      console.error('Wishlist storage error:', e);
     }
   }, []);
 
   const toggleWishlist = (product) => {
-    const exists = wishlist.some((item) => item._id === product._id);
+    if (!product || !product._id) return;
+    const exists = wishlist.some((item) => item && item._id === product._id);
     let updated;
     if (exists) {
-      updated = wishlist.filter((item) => item._id !== product._id);
+      updated = wishlist.filter((item) => item && item._id !== product._id);
     } else {
       updated = [...wishlist, product];
     }
     setWishlist(updated);
-    localStorage.setItem('sajjad_wishlist', JSON.stringify(updated));
+    try {
+      localStorage.setItem('sajjad_wishlist', JSON.stringify(updated));
+    } catch (e) {}
   };
 
-  const isInWishlist = (productId) => wishlist.some((item) => item._id === productId);
+  const isInWishlist = (productId) => {
+    if (!productId) return false;
+    return wishlist.some((item) => item && item._id === productId);
+  };
 
   return (
     <WishlistContext.Provider value={{ wishlist, toggleWishlist, isInWishlist }}>
