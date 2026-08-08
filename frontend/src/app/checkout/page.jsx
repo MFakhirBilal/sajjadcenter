@@ -101,31 +101,44 @@ export default function CheckoutPage() {
     setFormData({ ...formData, [nameKey]: e.target.value });
   };
 
-  const handlePlaceOrder = (e) => {
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     const trackingId = 'SCH-' + Math.floor(100000 + Math.random() * 900000);
 
-    setTimeout(() => {
-      const newOrder = {
-        trackingId,
-        itemsPrice,
-        shippingPrice,
-        discountAmount,
-        totalPrice,
-        paymentMethod,
-        transactionRef,
-        orderItems: cartItems,
-        shippingAddress: formData,
-        orderStatus: 'Pending',
-        createdAt: new Date().toISOString()
-      };
+    const newOrder = {
+      trackingId,
+      itemsPrice,
+      shippingPrice,
+      discountAmount,
+      totalPrice,
+      paymentMethod,
+      transactionRef,
+      orderItems: cartItems,
+      shippingAddress: formData,
+      orderStatus: 'Pending',
+      createdAt: new Date().toISOString()
+    };
 
-      setOrderComplete(newOrder);
-      clearCart();
-      setIsSubmitting(false);
-    }, 1500);
+    try {
+      await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrder)
+      });
+    } catch (err) {
+      console.error('Order API Sync Error:', err);
+    }
+
+    try {
+      const existing = JSON.parse(localStorage.getItem('sajjad_live_orders') || '[]');
+      localStorage.setItem('sajjad_live_orders', JSON.stringify([newOrder, ...existing]));
+    } catch (err) {}
+
+    setOrderComplete(newOrder);
+    clearCart();
+    setIsSubmitting(false);
   };
 
   if (orderComplete) {
