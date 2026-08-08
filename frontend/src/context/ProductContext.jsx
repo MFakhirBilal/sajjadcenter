@@ -11,7 +11,7 @@ export function ProductProvider({ children }) {
   const [products, setProducts] = useState(sampleProducts);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load products from localStorage AND fetch from live Backend API /api/products
+  // Load products from localStorage AND fetch from live Backend API /api/products safely
   useEffect(() => {
     async function loadCatalog() {
       let localProds = [];
@@ -19,8 +19,8 @@ export function ProductProvider({ children }) {
         const savedProducts = localStorage.getItem(STORAGE_KEY);
         if (savedProducts) {
           const parsed = JSON.parse(savedProducts);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            localProds = parsed;
+          if (Array.isArray(parsed)) {
+            localProds = parsed.filter((p) => p && typeof p === 'object');
           }
         }
       } catch (err) {
@@ -31,16 +31,30 @@ export function ProductProvider({ children }) {
         const res = await fetch('/api/products', { cache: 'no-store' });
         if (res.ok) {
           const data = await res.json();
-          if (data && Array.isArray(data.products) && data.products.length > 0) {
-            // Merge local custom added products (like 'king') with backend products
-            const backendMap = new Map(data.products.map((p) => [p.slug || p._id, p]));
+          let rawList = [];
+          
+          if (Array.isArray(data)) {
+            rawList = data;
+          } else if (data && Array.isArray(data.products)) {
+            rawList = data.products;
+          }
+
+          if (rawList.length > 0) {
+            const cleanBackend = rawList.filter((p) => p && typeof p === 'object');
+            const backendSlugs = new Set(
+              cleanBackend.map((p) => String(p.slug || p._id || p.name))
+            );
             
-            // Bring local products that might not be in backend yet
-            const customAdded = localProds.filter((lp) => !backendMap.has(lp.slug || lp._id));
-            const merged = [...customAdded, ...data.products];
+            const customAdded = localProds.filter(
+              (lp) => lp && !backendSlugs.has(String(lp.slug || lp._id || lp.name))
+            );
             
+            const merged = [...customAdded, ...cleanBackend];
+
             setProducts(merged);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+            } catch (e) {}
             setIsLoaded(true);
             return;
           }
@@ -62,9 +76,10 @@ export function ProductProvider({ children }) {
 
   // Save to localStorage whenever products state changes
   const saveProducts = (updatedList) => {
-    setProducts(updatedList);
+    const validList = Array.isArray(updatedList) ? updatedList.filter((p) => p && typeof p === 'object') : [];
+    setProducts(validList);
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(validList));
     } catch (err) {
       console.error('Failed to save products to localStorage:', err);
     }
@@ -72,6 +87,8 @@ export function ProductProvider({ children }) {
 
   // Add a new product created from Admin Panel
   const addProduct = async (newProductData) => {
+    if (!newProductData || !newProductData.name) return null;
+
     const slug = newProductData.slug || newProductData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     const createdProduct = {
       _id: `prod-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
@@ -82,7 +99,7 @@ export function ProductProvider({ children }) {
       price: Number(newProductData.price) || 0,
       salePrice: Number(newProductData.salePrice) || 0,
       stock: Number(newProductData.stock) || 10,
-      images: newProductData.images && newProductData.images.length > 0
+      images: newProductData.images && Array.isArray(newProductData.images) && newProductData.images.length > 0
         ? newProductData.images
         : ['https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800'],
       sku: newProductData.sku || `SCH-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -117,7 +134,7 @@ export function ProductProvider({ children }) {
 
   // Delete product by ID
   const deleteProduct = async (id) => {
-    const updatedList = products.filter((p) => p._id !== id);
+    const updatedList = products.filter((p) => p && p._id !== id);
     saveProducts(updatedList);
 
     try {
